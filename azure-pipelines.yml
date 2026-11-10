@@ -2,6 +2,8 @@
 
 
 
+
+
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -14,15 +16,16 @@ variables:
 
 stages:
   - stage: dockerbuild
-    displayName: 'Docker Build'
+    displayName: 'Docker Build and Push'
 
     jobs:
       - job: buildpushimages
-        displayName: 'Build and Push Images'
+        displayName: 'Build and Push All Images'
 
         steps:
           - checkout: self
 
+          # Frontend Docker Image
           - task: Docker@2
             displayName: 'Build and Push Frontend'
             inputs:
@@ -35,4 +38,29 @@ stages:
                 $(tag)
                 latest
 
+          # User Service Docker Image
+          - task: Docker@2
+            displayName: 'Build and Push User Service'
+            inputs:
+              containerRegistry: '$(acrserviceconnection)'
+              repository: '$(userrepository)'
+              command: 'buildAndPush'
+              Dockerfile: 'user-service/Dockerfile'
+              buildContext: 'user-service'
+              tags: |
+                $(tag)
+                latest
+
+          # Payment Service Docker Image
+          - task: Docker@2
+            displayName: 'Build and Push Payment Service'
+            inputs:
+              containerRegistry: '$(acrserviceconnection)'
+              repository: '$(paymentrepository)'
+              command: 'buildAndPush'
+              Dockerfile: 'payment-service/Dockerfile'
+              buildContext: 'payment-service'
+              tags: |
+                $(tag)
+                latest
 
