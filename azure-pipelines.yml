@@ -1,4 +1,9 @@
 
+# CredPay - Docker Build and Push Pipeline
+
+trigger:
+  - main
+
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -18,8 +23,10 @@ stages:
         displayName: 'Build and Push All Images'
 
         steps:
+          # Step 1: Checkout source code
           - checkout: self
 
+          # Step 2: Build and Push Frontend
           - task: Docker@2
             displayName: 'Build and Push Frontend'
             inputs:
@@ -32,6 +39,7 @@ stages:
                 $(tag)
                 latest
 
+          # Step 3: Build and Push User Service
           - task: Docker@2
             displayName: 'Build and Push User Service'
             inputs:
@@ -44,6 +52,7 @@ stages:
                 $(tag)
                 latest
 
+          # Step 4: Build and Push Payment Service
           - task: Docker@2
             displayName: 'Build and Push Payment Service'
             inputs:
